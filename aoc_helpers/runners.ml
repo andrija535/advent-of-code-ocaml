@@ -26,7 +26,9 @@ let get_config (exec_name: string) : runner_configuration =
     ) !input_file 
   in
   match input_file with
-  | None -> Printf.eprintf "%s\n" (usage_message exec_name); exit 1
+  | None -> 
+      Printf.eprintf "%s\n" @@ usage_message exec_name;
+      exit 1
   | Some config -> config
 
 let run ~(exec_name: string) ~(day_mapping: int -> string Seq.t -> 'a) ~(printer: Format.formatter -> 'a -> unit): unit =

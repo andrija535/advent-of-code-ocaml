@@ -1,6 +1,13 @@
+
+let bit_to_int = function
+  | '0' -> 0
+  | '1' -> 1
+  | c -> failwith @@ Printf.sprintf "Invalid bit character: %c" c
+
 let get_bit_list line = 
-  String.split_on_char ' ' line 
-  |> List.map int_of_string
+  String.to_seq line
+  |> Seq.map bit_to_int
+  |> List.of_seq
 
 let get_columns (rows: 'a list list): 'a list list =
   match rows with
@@ -20,7 +27,7 @@ let get_most_common_bit (bits: int list): int =
       match bit with
       | 0 -> (count0 + 1, count1)
       | 1 -> (count0, count1 + 1)
-      | _ -> failwith "Invalid bit"
+      | b -> failwith @@ Printf.sprintf "Invalid bit: %d" b
     ) (0, 0) bits 
   in
   if count1 >= count0 then 1 else 0
