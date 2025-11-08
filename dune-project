@@ -1,28 +1,31 @@
-(lang dune 3.19)
+(lang dune 3.20)
 
-(name advent_of_code)
+(name advent_of_code_ocaml)
 
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github andrija535/advent-of-code-ocaml))
 
-(authors "Author Name <author@example.com>")
+(authors "Andrija")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
-
-(license LICENSE)
-
-(documentation https://url/to/documentation)
+(license GPL-3.0-or-later)
 
 (package
- (name advent_of_code)
- (synopsis "A short synopsis")
- (description "A longer description")
+  (name aoc_helpers)
+  (synopsis "Helper library for Advent of Code in OCaml")
+  (description "A helper library providing common utilities for solving Advent of Code problems in OCaml")
+  (depends
+   ocaml)
+  (tags
+   ("aoc" "ocaml")))
+
+(package
+ (name aoc2021)
+ (synopsis "A collection of solutions for Advent of Code 2021 in OCaml")
+ (description "A collection of solutions for Advent of Code 2023 in OCaml")
  (depends
   ocaml
-  angstrom)
+  aoc_helpers)
  (tags
-  ("add topics" "to describe" your project)))
-
-; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
+  ("aoc" "ocaml")))

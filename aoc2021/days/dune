@@ -1,0 +1,4 @@
+(library
+ (name days)
+ (public_name aoc2021.days)
+ (libraries aoc_helpers))

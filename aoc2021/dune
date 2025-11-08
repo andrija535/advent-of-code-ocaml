@@ -1,0 +1,6 @@
+(executable
+  (public_name aoc2021)
+  (name runner)
+  (package aoc2021)
+  (libraries days))
+
