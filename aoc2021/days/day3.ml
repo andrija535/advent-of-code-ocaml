@@ -1,49 +1,52 @@
-
-let bit_to_int = function
-  | '0' -> 0
-  | '1' -> 1
-  | c -> failwith @@ Printf.sprintf "Invalid bit character: %c" c
-
-let get_bit_list line = 
-  String.to_seq line
-  |> Seq.map bit_to_int
-  |> List.of_seq
-
+(* Ignores order because it shouldn't matter for this problem *)
 let get_columns (rows: 'a list list): 'a list list =
   match rows with
   | [] -> failwith "Empty input"
   | x::xs ->
-      let x = List.(map singleton x) in
-      List.fold_left (fun acc row ->
-        List.to_seq acc
-        |> Seq.zip (List.to_seq row)
+      let open List in
+      let x = map singleton x in
+      fold_left (fun acc row ->
+        to_seq acc
+        |> Seq.zip (to_seq row)
         |> Seq.map (fun (a, b) -> a::b)
-        |> List.of_seq
+        |> of_seq
       ) x xs
 
 let get_most_common_bit (bits: int list): int =
-  let (count0, count1) = 
-    List.fold_left (fun (count0, count1) bit ->
-      match bit with
-      | 0 -> (count0 + 1, count1)
-      | 1 -> (count0, count1 + 1)
-      | b -> failwith @@ Printf.sprintf "Invalid bit: %d" b
-    ) (0, 0) bits 
-  in
-  if count1 >= count0 then 1 else 0
+  let s = List.fold_left (fun s x -> if x = 1 then s + 1 else s - 1) 0 bits in
+  if s >= 0 then 1 else 0
 
 let bits_to_int (bits: int list): int =
-  List.to_seq bits
-  |> Seq.zip (Seq.iterate (( * ) 2) 0)
-  |> Seq.fold_left (fun acc (bit, power) -> acc + (bit * power)) 0
+  List.(to_seq @@ rev bits)
+  |> Seq.zip (Seq.iterate ((+) 1) 0)
+  |> Seq.fold_left (fun acc (power, bit) -> acc + bit * int_of_float (2. ** float_of_int power)) 0
 
-let run (lines: string Seq.t): int =
-  let gamma = List.(
-    of_seq lines
-    |> map get_bit_list
-    |> get_columns
-    |> map get_most_common_bit
-    |> bits_to_int
-  ) in
-  let epilson = lnot gamma in
-  gamma * epilson
+let get_bit_list line = 
+  let bit_to_int = function
+    | '0' -> 0
+    | '1' -> 1
+    | c -> failwith @@ Printf.sprintf "Invalid bit character: %c" c
+  in
+  String.to_seq line
+  |> Seq.map bit_to_int
+  |> List.of_seq
+
+let gamma_bits (lines: string list): int list =
+  List.(map get_bit_list lines
+  |> get_columns
+  |> map get_most_common_bit)
+
+let flip_bits (bits: int list): int list =
+  List.map (function
+    | 0 -> 1
+    | 1 -> 0
+    | b -> failwith @@ Printf.sprintf "Invalid bit to flip: %d" b
+  ) bits
+
+let day1 (lines: string Seq.t): int =
+  let lines = List.of_seq lines in
+  let gamma = gamma_bits lines in
+  let epilson = flip_bits gamma in
+  bits_to_int gamma * bits_to_int epilson
+
+let day2 (_lines: string Seq.t): string = "Not implemented yet"

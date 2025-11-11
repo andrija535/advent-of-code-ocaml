@@ -3,6 +3,13 @@ type runner_configuration = {
   input_file: string
 }
 
+type ('a,'b) day_solution = {
+  day1: string Seq.t -> 'a;
+  day2: string Seq.t -> 'b
+}
+
+type ('a,'b) day_mapping = int -> ('a,'b) day_solution
+
 let day = ref 1
 let input_file = ref None
 
@@ -31,9 +38,17 @@ let get_config (exec_name: string) : runner_configuration =
       exit 1
   | Some config -> config
 
-let run ~(exec_name: string) ~(day_mapping: int -> string Seq.t -> 'a) ~(printer: Format.formatter -> 'a -> unit): unit =
+let run 
+  ~(exec_name: string) 
+  ~(day_mapping: ('a,'b) day_mapping)
+  ~(printer_day1: Format.formatter -> 'a -> unit)
+  ~(printer_day2: Format.formatter -> 'b -> unit) =
   parse_args exec_name;
   let runner_config = get_config exec_name in
-  Io.read_lines runner_config.input_file 
-  |> day_mapping runner_config.day 
-  |> Format.printf "Result of day %d: %a\n" runner_config.day printer 
+  let lines = Io.read_lines runner_config.input_file in
+  let day_solutions = day_mapping runner_config.day in
+  let d1,d2 = day_solutions.day1 lines, day_solutions.day2 lines in
+  Format.printf "Result of day %d:\nPart 1: %a\nPart 2: %a\n"
+    runner_config.day
+    printer_day1 d1
+    printer_day2 d2
