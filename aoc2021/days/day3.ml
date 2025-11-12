@@ -1,21 +1,3 @@
-(* Ignores order because it shouldn't matter for this problem *)
-let get_columns (rows: 'a list list): 'a list list =
-  match rows with
-  | [] -> failwith "Empty input"
-  | x::xs ->
-      let open List in
-      let x = map singleton x in
-      fold_left (fun acc row ->
-        to_seq acc
-        |> Seq.zip (to_seq row)
-        |> Seq.map (fun (a, b) -> a::b)
-        |> of_seq
-      ) x xs
-
-let get_most_common_bit (bits: int list): int =
-  let s = List.fold_left (fun s x -> if x = 1 then s + 1 else s - 1) 0 bits in
-  if s >= 0 then 1 else 0
-
 let bits_to_int (bits: int list): int =
   List.(to_seq @@ rev bits)
   |> Seq.zip (Seq.iterate ((+) 1) 0)
@@ -31,10 +13,16 @@ let get_bit_list line =
   |> Seq.map bit_to_int
   |> List.of_seq
 
-let gamma_bits (lines: string list): int list =
-  List.(map get_bit_list lines
-  |> get_columns
-  |> map get_most_common_bit)
+let gamma_bits : string list -> int list = function
+  | [] -> failwith "Empty input"
+  | x::xs -> 
+      let x = get_bit_list x in
+      List.fold_left (fun acc line -> 
+        let bits = get_bit_list line in
+        List.map2 (fun x y -> if y = 1 then x+1 else x-1) acc bits
+      ) x xs
+  |> List.map (fun count -> if count > 0 then 1 else 0)
+
 
 let flip_bits (bits: int list): int list =
   List.map (function
